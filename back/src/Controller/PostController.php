@@ -40,7 +40,7 @@ class PostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $post->setUser($user);
-            $post->setCreatedAt(new \DateTime());
+            $post->setCreatedAt($commission->getCreatedAt());
 
             $entityManager->persist($post);
             $entityManager->flush();

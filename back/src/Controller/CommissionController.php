@@ -37,7 +37,7 @@ class CommissionController extends AbstractController
                 throw new AccessDeniedException('You must be logged in to create a commission.');
             }
 
-            $commission->setCreatedAt(new \DateTime());
+            $commission->setCreatedAt($commission->getCreatedAt());
 
             // Créer un post associé à la commission
             $post = new Post();
