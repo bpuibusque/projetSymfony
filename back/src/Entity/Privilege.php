@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\PrivilegeRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PrivilegeRepository::class)]
@@ -11,17 +10,19 @@ class Privilege
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'privileges')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'privileges')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column]
-    private ?bool $canCreateComission = null;
+    #[ORM\ManyToOne(targetEntity: Commission::class, inversedBy: 'privileges')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Commission $commission = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $role = null;
 
     public function getId(): ?int
     {
@@ -33,33 +34,33 @@ class Privilege
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(?User $user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function isCanCreateComission(): ?bool
+    public function getCommission(): ?Commission
     {
-        return $this->canCreateComission;
+        return $this->commission;
     }
 
-    public function setCanCreateComission(bool $canCreateComission): static
+    public function setCommission(?Commission $commission): self
     {
-        $this->canCreateComission = $canCreateComission;
+        $this->commission = $commission;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getRole(): ?string
     {
-        return $this->createdAt;
+        return $this->role;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setRole(string $role): self
     {
-        $this->createdAt = $createdAt;
+        $this->role = $role;
 
         return $this;
     }

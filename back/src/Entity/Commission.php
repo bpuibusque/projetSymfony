@@ -25,17 +25,21 @@ class Commission
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\OneToMany(targetEntity: UserCommissionSubscription::class, mappedBy: 'commission')]
+    #[ORM\OneToMany(mappedBy: 'commission', targetEntity: UserCommissionSubscription::class)]
     private Collection $userCommissionSubscriptions;
 
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'commission')]
+    #[ORM\OneToMany(mappedBy: 'commission', targetEntity: Post::class)]
     private Collection $posts;
+
+    #[ORM\OneToMany(mappedBy: 'commission', targetEntity: Privilege::class)]
+    private Collection $privileges;
 
     public function __construct()
     {
         $this->userCommissionSubscriptions = new ArrayCollection();
         $this->posts = new ArrayCollection();
-        $this->createdAt = new \DateTime(); 
+        $this->privileges = new ArrayCollection();
+        $this->createdAt = new \DateTime();
     }
 
     public function getId(): ?int
@@ -48,10 +52,9 @@ class Commission
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -60,10 +63,9 @@ class Commission
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(string $description): self
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -72,10 +74,9 @@ class Commission
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -87,17 +88,17 @@ class Commission
         return $this->userCommissionSubscriptions;
     }
 
-    public function addUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): static
+    public function addUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): self
     {
         if (!$this->userCommissionSubscriptions->contains($userCommissionSubscription)) {
-            $this->userCommissionSubscriptions->add($userCommissionSubscription);
+            $this->userCommissionSubscriptions[] = $userCommissionSubscription;
             $userCommissionSubscription->setCommission($this);
         }
 
         return $this;
     }
 
-    public function removeUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): static
+    public function removeUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): self
     {
         if ($this->userCommissionSubscriptions->removeElement($userCommissionSubscription)) {
             if ($userCommissionSubscription->getCommission() === $this) {
@@ -116,21 +117,50 @@ class Commission
         return $this->posts;
     }
 
-    public function addPost(Post $post): static
+    public function addPost(Post $post): self
     {
         if (!$this->posts->contains($post)) {
-            $this->posts->add($post);
+            $this->posts[] = $post;
             $post->setCommission($this);
         }
 
         return $this;
     }
 
-    public function removePost(Post $post): static
+    public function removePost(Post $post): self
     {
         if ($this->posts->removeElement($post)) {
             if ($post->getCommission() === $this) {
                 $post->setCommission(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Privilege>
+     */
+    public function getPrivileges(): Collection
+    {
+        return $this->privileges;
+    }
+
+    public function addPrivilege(Privilege $privilege): self
+    {
+        if (!$this->privileges->contains($privilege)) {
+            $this->privileges[] = $privilege;
+            $privilege->setCommission($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrivilege(Privilege $privilege): self
+    {
+        if ($this->privileges->removeElement($privilege)) {
+            if ($privilege->getCommission() === $this) {
+                $privilege->setCommission(null);
             }
         }
 
