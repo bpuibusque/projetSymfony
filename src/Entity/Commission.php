@@ -13,7 +13,7 @@ class Commission
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -25,22 +25,18 @@ class Commission
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
-    /**
-     * @var Collection<int, UserCommissionSubscription>
-     */
-    #[ORM\OneToMany(targetEntity: UserCommissionSubscription::class, mappedBy: 'comission')]
+    #[ORM\OneToMany(targetEntity: UserCommissionSubscription::class, mappedBy: 'commission')]
     private Collection $userCommissionSubscriptions;
+
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'commission')]
+    private Collection $posts;
 
     public function __construct()
     {
         $this->userCommissionSubscriptions = new ArrayCollection();
+        $this->posts = new ArrayCollection();
+        $this->createdAt = new \DateTime(); 
     }
-
-    /**
-     * @var Collection<int, Post>
-     */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'comission')]
-
 
     public function getId(): ?int
     {
@@ -84,10 +80,6 @@ class Commission
     }
 
     /**
-     * @return Collection<int, Post>
-     */
-
-    /**
      * @return Collection<int, UserCommissionSubscription>
      */
     public function getUserCommissionSubscriptions(): Collection
@@ -99,7 +91,7 @@ class Commission
     {
         if (!$this->userCommissionSubscriptions->contains($userCommissionSubscription)) {
             $this->userCommissionSubscriptions->add($userCommissionSubscription);
-            $userCommissionSubscription->setComission($this);
+            $userCommissionSubscription->setCommission($this);
         }
 
         return $this;
@@ -108,13 +100,40 @@ class Commission
     public function removeUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): static
     {
         if ($this->userCommissionSubscriptions->removeElement($userCommissionSubscription)) {
-            // set the owning side to null (unless already changed)
-            if ($userCommissionSubscription->getComission() === $this) {
-                $userCommissionSubscription->setComission(null);
+            if ($userCommissionSubscription->getCommission() === $this) {
+                $userCommissionSubscription->setCommission(null);
             }
         }
 
         return $this;
     }
 
+    /**
+     * @return Collection<int, Post>
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(Post $post): static
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->setCommission($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(Post $post): static
+    {
+        if ($this->posts->removeElement($post)) {
+            if ($post->getCommission() === $this) {
+                $post->setCommission(null);
+            }
+        }
+
+        return $this;
+    }
 }
