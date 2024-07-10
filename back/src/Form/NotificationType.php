@@ -21,11 +21,11 @@ class NotificationType extends AbstractType
             ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
-'choice_label' => 'id',
+                'choice_label' => 'id',
             ])
             ->add('post', EntityType::class, [
                 'class' => Post::class,
-'choice_label' => 'id',
+                'choice_label' => 'id',
             ])
         ;
     }
