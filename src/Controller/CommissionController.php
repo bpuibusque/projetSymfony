@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Commission;
+use App\Entity\Post;
 use App\Form\CommissionType;
 use App\Repository\CommissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[Route('/commission')]
 class CommissionController extends AbstractController
@@ -30,7 +32,23 @@ class CommissionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            if (!$user) {
+                throw new AccessDeniedException('You must be logged in to create a commission.');
+            }
+
+            $commission->setCreatedAt(new \DateTime());
+
+            // Créer un post associé à la commission
+            $post = new Post();
+            $post->setUser($user);
+            $post->setCommission($commission);
+            $post->setTitle('Commission Created: ' . $commission->getName());
+            $post->setContent($commission->getDescription());
+            $post->setCreatedAt(new \DateTime());
+
             $entityManager->persist($commission);
+            $entityManager->persist($post);
             $entityManager->flush();
 
             return $this->redirectToRoute('commission_index');

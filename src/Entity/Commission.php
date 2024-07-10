@@ -100,7 +100,6 @@ class Commission
     public function removeUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): static
     {
         if ($this->userCommissionSubscriptions->removeElement($userCommissionSubscription)) {
-            // set the owning side to null (unless already changed)
             if ($userCommissionSubscription->getCommission() === $this) {
                 $userCommissionSubscription->setCommission(null);
             }
