@@ -15,6 +15,13 @@ class AdminPrivilegeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('action', ChoiceType::class, [
+                'choices' => [
+                    'Ajouter' => 'add',
+                    'Supprimer' => 'remove',
+                ],
+                'label' => 'Action',
+            ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'email',

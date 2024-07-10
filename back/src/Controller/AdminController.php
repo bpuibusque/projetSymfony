@@ -23,26 +23,49 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
+            $action = $data['action'];
             $user = $data['user'];
             $commission = $data['commission'];
             $role = $data['role'];
 
-            $privilege = new Privilege();
-            $privilege->setUser($user);
-            $privilege->setCommission($commission);
-            $privilege->setRole($role);
+            if ($action === 'add') {
+                $privilege = new Privilege();
+                $privilege->setUser($user);
+                $privilege->setCommission($commission);
+                $privilege->setRole($role);
 
-            $entityManager->persist($privilege);
-            $entityManager->flush();
+                $entityManager->persist($privilege);
+                $entityManager->flush();
+            } elseif ($action === 'remove') {
+                $privilege = $entityManager->getRepository(Privilege::class)->findOneBy([
+                    'user' => $user,
+                    'commission' => $commission,
+                    'role' => $role,
+                ]);
+
+                if ($privilege) {
+                    $entityManager->remove($privilege);
+                    $entityManager->flush();
+                }
+            }
 
             return $this->redirectToRoute('admin_privileges');
         }
 
         $privileges = $entityManager->getRepository(Privilege::class)->findAll();
+        $groupedPrivileges = [];
+
+        foreach ($privileges as $privilege) {
+            $userEmail = $privilege->getUser()->getEmail();
+            if (!isset($groupedPrivileges[$userEmail])) {
+                $groupedPrivileges[$userEmail] = [];
+            }
+            $groupedPrivileges[$userEmail][] = $privilege;
+        }
 
         return $this->render('admin/manage_privileges.html.twig', [
             'form' => $form->createView(),
-            'privileges' => $privileges,
+            'groupedPrivileges' => $groupedPrivileges,
         ]);
     }
 }

@@ -6,6 +6,7 @@
     <h1>Gérer les privilèges des utilisateurs</h1>
 
     {{ form_start(form) }}
+        {{ form_row(form.action) }}
         {{ form_row(form.user) }}
         {{ form_row(form.commission) }}
         {{ form_row(form.role) }}
@@ -13,22 +14,23 @@
     {{ form_end(form) }}
 
     <h2>Liste des privilèges</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Utilisateur</th>
-                <th>Commission</th>
-                <th>Rôle</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for privilege in privileges %}
+    {% for userEmail, privileges in groupedPrivileges %}
+        <h3>{{ userEmail }}</h3>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>{{ privilege.user.email }}</td>
-                    <td>{{ privilege.commission.name }}</td>
-                    <td>{{ privilege.role }}</td>
+                    <th>Commission</th>
+                    <th>Rôle</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for privilege in privileges %}
+                    <tr>
+                        <td>{{ privilege.commission.name }}</td>
+                        <td>{{ privilege.role }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
 {% endblock %}
