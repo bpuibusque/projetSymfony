@@ -14,11 +14,11 @@ class PrivateMessage
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'privateMessages')]
+    #[ORM\ManyToOne(inversedBy: 'sentMessages')]
     private ?User $sender = null;
 
-    #[ORM\ManyToOne(inversedBy: 'privateMessages')]
-    private ?USer $receiver = null;
+    #[ORM\ManyToOne(inversedBy: 'receivedMessages')]
+    private ?User $receiver = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
@@ -28,6 +28,12 @@ class PrivateMessage
 
     #[ORM\Column]
     private ?bool $isRead = null;
+
+    public function __construct()
+    {
+        $this->sendAt = new \DateTime();
+        $this->isRead = false;
+    }
 
     public function getId(): ?int
     {
@@ -42,19 +48,17 @@ class PrivateMessage
     public function setSender(?User $sender): static
     {
         $this->sender = $sender;
-
         return $this;
     }
 
-    public function getReceiver(): ?USer
+    public function getReceiver(): ?User
     {
         return $this->receiver;
     }
 
-    public function setReceiver(?USer $receiver): static
+    public function setReceiver(?User $receiver): static
     {
         $this->receiver = $receiver;
-
         return $this;
     }
 
@@ -66,7 +70,6 @@ class PrivateMessage
     public function setContent(string $content): static
     {
         $this->content = $content;
-
         return $this;
     }
 
@@ -78,7 +81,6 @@ class PrivateMessage
     public function setSendAt(\DateTimeInterface $sendAt): static
     {
         $this->sendAt = $sendAt;
-
         return $this;
     }
 
@@ -90,7 +92,6 @@ class PrivateMessage
     public function setRead(bool $isRead): static
     {
         $this->isRead = $isRead;
-
         return $this;
     }
 }

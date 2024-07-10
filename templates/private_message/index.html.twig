@@ -1,20 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello PrivateMessageController!{% endblock %}
+{% block title %}Private Messages{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <h1>Private Messages</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Sender</th>
+                <th>Receiver</th>
+                <th>Content</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for private_message in private_messages %}
+            <tr>
+                <td>{{ private_message.id }}</td>
+                <td>{{ private_message.sender ? private_message.sender.email : 'Unknown' }}</td>
+                <td>{{ private_message.receiver ? private_message.receiver.email : 'Unknown' }}</td>
+                <td>{{ private_message.content }}</td>
+                <td>
+                    <a href="{{ path('private_message_show', {'id': private_message.id}) }}">show</a>
+                    <a href="{{ path('private_message_edit', {'id': private_message.id}) }}">edit</a>
+                    <form method="post" action="{{ path('private_message_delete', {'id': private_message.id}) }}" style="display:inline-block">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ private_message.id) }}">
+                        <button class="btn">delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>D:/Projet Symfony/projetSymfony/src/Controller/PrivateMessageController.php</code></li>
-        <li>Your template at <code>D:/Projet Symfony/projetSymfony/templates/private_message/index.html.twig</code></li>
-    </ul>
-</div>
+    <a href="{{ path('private_message_new') }}">Create new</a>
 {% endblock %}
