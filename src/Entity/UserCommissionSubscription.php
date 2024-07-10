@@ -36,12 +36,12 @@ class UserCommissionSubscription
         return $this;
     }
 
-    public function getComission(): ?Commission
+    public function getCommission(): ?Commission
     {
         return $this->comission;
     }
 
-    public function setComission(?Commission $comission): static
+    public function setCommission(?Commission $comission): static
     {
         $this->comission = $comission;
 
