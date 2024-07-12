@@ -54,10 +54,16 @@ class CommissionController extends AbstractController
                 'title' => $post->getTitle(),
                 'content' => $post->getContent(),
                 'createdAt' => $post->getCreatedAt()->format('Y-m-d H:i:s'),
+                'user' => [
+                    'email' => $post->getUser()->getEmail()
+                ]
             ];
         }
 
-        return new JsonResponse($data);
+        return new JsonResponse([
+            'commissionName' => $commission->getName(),
+            'posts' => $data
+        ]);
     }
 
     #[Route('/new', name: 'commission_new', methods: ['GET', 'POST'])]
