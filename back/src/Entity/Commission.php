@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\CommissionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommissionRepository::class)]
@@ -19,25 +18,25 @@ class Commission
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: 'text')]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\OneToMany(mappedBy: 'commission', targetEntity: UserCommissionSubscription::class)]
-    private Collection $userCommissionSubscriptions;
 
     #[ORM\OneToMany(mappedBy: 'commission', targetEntity: Post::class)]
     private Collection $posts;
+
+    #[ORM\OneToMany(mappedBy: 'commission', targetEntity: UserCommissionSubscription::class)]
+    private Collection $subscriptions;
 
     #[ORM\OneToMany(mappedBy: 'commission', targetEntity: Privilege::class)]
     private Collection $privileges;
 
     public function __construct()
     {
-        $this->userCommissionSubscriptions = new ArrayCollection();
         $this->posts = new ArrayCollection();
+        $this->subscriptions = new ArrayCollection();
         $this->privileges = new ArrayCollection();
         $this->createdAt = new \DateTime();
     }
@@ -81,35 +80,6 @@ class Commission
     }
 
     /**
-     * @return Collection<int, UserCommissionSubscription>
-     */
-    public function getUserCommissionSubscriptions(): Collection
-    {
-        return $this->userCommissionSubscriptions;
-    }
-
-    public function addUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): self
-    {
-        if (!$this->userCommissionSubscriptions->contains($userCommissionSubscription)) {
-            $this->userCommissionSubscriptions[] = $userCommissionSubscription;
-            $userCommissionSubscription->setCommission($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserCommissionSubscription(UserCommissionSubscription $userCommissionSubscription): self
-    {
-        if ($this->userCommissionSubscriptions->removeElement($userCommissionSubscription)) {
-            if ($userCommissionSubscription->getCommission() === $this) {
-                $userCommissionSubscription->setCommission(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Post>
      */
     public function getPosts(): Collection
@@ -132,6 +102,35 @@ class Commission
         if ($this->posts->removeElement($post)) {
             if ($post->getCommission() === $this) {
                 $post->setCommission(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserCommissionSubscription>
+     */
+    public function getSubscriptions(): Collection
+    {
+        return $this->subscriptions;
+    }
+
+    public function addSubscription(UserCommissionSubscription $subscription): self
+    {
+        if (!$this->subscriptions->contains($subscription)) {
+            $this->subscriptions[] = $subscription;
+            $subscription->setCommission($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscription(UserCommissionSubscription $subscription): self
+    {
+        if ($this->subscriptions->removeElement($subscription)) {
+            if ($subscription->getCommission() === $this) {
+                $subscription->setCommission(null);
             }
         }
 

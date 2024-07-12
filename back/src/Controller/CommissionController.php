@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Commission;
 use App\Entity\Post;
+use App\Entity\UserCommissionSubscription;
 use App\Form\CommissionType;
 use App\Repository\CommissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,9 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-#[Route('/commission')]
+#[Route('/commissions')]
 class CommissionController extends AbstractController
 {
     #[Route('/', name: 'commission_index', methods: ['GET'])]
@@ -32,23 +32,7 @@ class CommissionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            if (!$user) {
-                throw new AccessDeniedException('You must be logged in to create a commission.');
-            }
-
-            $commission->setCreatedAt($commission->getCreatedAt());
-
-            // Créer un post associé à la commission
-            $post = new Post();
-            $post->setUser($user);
-            $post->setCommission($commission);
-            $post->setTitle('Commission Created: ' . $commission->getName());
-            $post->setContent($commission->getDescription());
-            $post->setCreatedAt(new \DateTime());
-
             $entityManager->persist($commission);
-            $entityManager->persist($post);
             $entityManager->flush();
 
             return $this->redirectToRoute('commission_index');
@@ -65,6 +49,7 @@ class CommissionController extends AbstractController
     {
         return $this->render('commission/show.html.twig', [
             'commission' => $commission,
+            'posts' => $commission->getPosts(),
         ]);
     }
 
@@ -95,5 +80,23 @@ class CommissionController extends AbstractController
         }
 
         return $this->redirectToRoute('commission_index');
+    }
+
+    #[Route('/{id}/subscribe', name: 'commission_subscribe', methods: ['POST'])]
+    public function subscribe(Request $request, Commission $commission, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('You must be logged in to subscribe to a commission.');
+        }
+
+        $subscription = new UserCommissionSubscription();
+        $subscription->setUser($user);
+        $subscription->setCommission($commission);
+
+        $entityManager->persist($subscription);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('commission_show', ['id' => $commission->getId()]);
     }
 }
