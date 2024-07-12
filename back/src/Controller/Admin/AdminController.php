@@ -14,7 +14,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 #[Route('/admin/user')]
 #[IsGranted('ROLE_ADMIN')]
-class UserController extends AbstractController
+class AdminController extends AbstractController
 {
     #[Route('/{id}/roles', name: 'admin_user_roles', methods: ['GET', 'POST'])]
     public function editRoles(User $user, Request $request, EntityManagerInterface $entityManager): Response
