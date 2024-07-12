@@ -14,30 +14,31 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/posts')]
 class PostController extends AbstractController
 {
-    #[Route('/new/{commissionId}', name: 'post_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, int $commissionId): Response
+    #[Route('/new', name: 'post_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         if (!$user) {
             throw $this->createAccessDeniedException('You must be logged in to create a post.');
         }
 
-        $commission = $entityManager->getRepository(Commission::class)->find($commissionId);
-        if (!$commission) {
-            throw $this->createNotFoundException('Commission not found.');
-        }
-
         $post = new Post();
         $post->setUser($user);
-        $post->setCommission($commission);
+
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($post->getCommission() === null) {
+                // Handle the post for the general commission
+                $generalCommission = $entityManager->getRepository(Commission::class)->findOneBy(['name' => 'General']);
+                $post->setCommission($generalCommission);
+            }
+
             $entityManager->persist($post);
             $entityManager->flush();
 
-            return $this->redirectToRoute('commission_show', ['id' => $commission->getId()]);
+            return $this->redirectToRoute('commission_show', ['id' => $post->getCommission()->getId()]);
         }
 
         return $this->render('post/new.html.twig', [

@@ -17,29 +17,33 @@ class Post
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $title = null;
+
+    #[ORM\Column(type: 'text')]
+    private ?string $content = null;
+
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\ManyToOne(targetEntity: Commission::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Commission $commission = null;
+
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Commission::class, inversedBy: 'posts')]
-    private ?Commission $commission = null;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $title = null;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
-
+    /**
+     * @var Collection<int, Notification>
+     */
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Notification::class)]
     private Collection $notifications;
 
     public function __construct()
     {
+        $this->createdAt = new \DateTime();
         $this->notifications = new ArrayCollection();
-        $this->createdAt = new \DateTime(); 
     }
 
     public function getId(): ?int
@@ -64,9 +68,9 @@ class Post
         return $this->commission;
     }
 
-    public function setCommission(?Commission $comission): static
+    public function setCommission(?Commission $commission): static
     {
-        $this->comission = $comission;
+        $this->commission = $commission;
 
         return $this;
     }

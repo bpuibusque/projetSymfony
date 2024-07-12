@@ -3,12 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Commission;
-use App\Entity\Post;
 use App\Entity\UserCommissionSubscription;
 use App\Form\CommissionType;
 use App\Repository\CommissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,6 +22,42 @@ class CommissionController extends AbstractController
         return $this->render('commission/index.html.twig', [
             'commissions' => $commissionRepository->findAll(),
         ]);
+    }
+
+    #[Route('/api', name: 'api_commission_index', methods: ['GET'])]
+    public function apiIndex(CommissionRepository $commissionRepository): JsonResponse
+    {
+        $commissions = $commissionRepository->findAll();
+        $data = [];
+
+        foreach ($commissions as $commission) {
+            $data[] = [
+                'id' => $commission->getId(),
+                'name' => $commission->getName(),
+                'description' => $commission->getDescription(),
+                'createdAt' => $commission->getCreatedAt()->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return new JsonResponse($data);
+    }
+
+    #[Route('/api/{id}/posts', name: 'api_commission_posts', methods: ['GET'])]
+    public function apiPosts(Commission $commission): JsonResponse
+    {
+        $posts = $commission->getPosts();
+        $data = [];
+
+        foreach ($posts as $post) {
+            $data[] = [
+                'id' => $post->getId(),
+                'title' => $post->getTitle(),
+                'content' => $post->getContent(),
+                'createdAt' => $post->getCreatedAt()->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return new JsonResponse($data);
     }
 
     #[Route('/new', name: 'commission_new', methods: ['GET', 'POST'])]
