@@ -1,7 +1,7 @@
 <template> 
     <nav>
       <ul>
-        <img src="/logo-symfony.png" alt="Logo du site" id="site-logo">
+        <router-link to="/"><img src="/logo-symfony.png" alt="Logo du site" id="site-logo"></router-link>
         <li><router-link to="/">Home</router-link></li>
         <li><router-link to="/commissions">Commissions</router-link></li>
         <li><router-link to="/private-messages">Private Messages</router-link></li>
