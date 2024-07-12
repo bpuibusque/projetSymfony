@@ -5,6 +5,8 @@
 {% block body %}
     <h1>Gérer les privilèges des utilisateurs</h1>
 
+    <a href="{{ path('homepage') }}" class="btn btn-secondary">Retour à l'accueil</a>
+
     {{ form_start(form) }}
         {{ form_row(form.action) }}
         {{ form_row(form.user) }}

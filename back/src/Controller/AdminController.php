@@ -12,10 +12,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 #[Route('/admin')]
-#[IsGranted('ROLE_ADMIN')]
 class AdminController extends AbstractController
 {
     #[Route('/privileges', name: 'admin_privileges', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function managePrivileges(Request $request, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(AdminPrivilegeType::class);

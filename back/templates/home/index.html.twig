@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Bienvenue sur notre site !</h1>
+        {% if app.user %}
+            <p>Vous êtes connecté en tant que {{ app.user.email }}</p>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                <a href="{{ path('admin_privileges') }}" class="btn btn-primary">Gérer les privilèges de Comissions</a>
+                <br>
+                <a href="{{ path('admin_user_index') }}" class="btn btn-primary">Gérer les utilisateurs</a>  
+                <br>              
+                <br>
+                <!-- Ajoutez d'autres liens pour les administrateurs ici -->
+            {% else %}
+                <p>Vous n'avez pas accès aux fonctionnalités administratives.</p>
+            {% endif %}
+        {% else %}
+            <p>Veuillez vous connecter</p>
+        {% endif %}
+    </div>
+{% endblock %}
