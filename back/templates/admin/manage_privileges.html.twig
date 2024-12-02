@@ -2,22 +2,37 @@
 
 {% block title %}Gestion des Privilèges{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin/manage_privileges.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Gérer les privilèges des utilisateurs</h1>
+<div class="container">
+    <h1 class="main-title">Gérer les privilèges des utilisateurs</h1>
 
     <a href="{{ path('homepage') }}" class="btn btn-secondary">Retour à l'accueil</a>
 
-    {{ form_start(form) }}
-        {{ form_row(form.action) }}
-        {{ form_row(form.user) }}
-        {{ form_row(form.commission) }}
-        {{ form_row(form.role) }}
-        <button type="submit" class="btn btn-primary">Mettre à jour le rôle</button>
-    {{ form_end(form) }}
+    <div class="form-container">
+        {{ form_start(form, { 'attr': { 'class': 'privilege-form' } }) }}
+            <div class="form-group">
+                {{ form_row(form.action) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(form.user) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(form.commission) }}
+            </div>
+            <div class="form-group">
+                {{ form_row(form.role) }}
+            </div>
+            <button type="submit" class="btn btn-primary">Mettre à jour le rôle</button>
+        {{ form_end(form) }}
+    </div>
 
-    <h2>Liste des privilèges</h2>
+    <h2 class="sub-title">Liste des privilèges</h2>
     {% for userEmail, privileges in groupedPrivileges %}
-        <h3>{{ userEmail }}</h3>
+        <h3 class="user-email">{{ userEmail }}</h3>
         <table class="table">
             <thead>
                 <tr>
@@ -35,4 +50,5 @@
             </tbody>
         </table>
     {% endfor %}
+</div>
 {% endblock %}

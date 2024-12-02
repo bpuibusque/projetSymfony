@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Message Privé - Détails{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/private_message/show.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="message-title">Détails du Message Privé</h1>
+    <div class="message-details">
+        <div class="detail-item">
+            <strong>Expéditeur :</strong> 
+            <span>{{ private_message.sender ? private_message.sender.email : 'Inconnu' }}</span>
+        </div>
+        <div class="detail-item">
+            <strong>Destinataire :</strong> 
+            <span>{{ private_message.receiver ? private_message.receiver.email : 'Inconnu' }}</span>
+        </div>
+        <div class="detail-item">
+            <strong>Contenu :</strong>
+            <p class="message-content">{{ private_message.content }}</p>
+        </div>
+        <div class="detail-item">
+            <strong>Date d'envoi :</strong>
+            <span>{{ private_message.sendAt|date('d/m/Y H:i') }}</span>
+        </div>
+    </div>
+    <div class="actions">
+        <a href="{{ path('private_message_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        <a href="{{ path('private_message_edit', {'id': private_message.id}) }}" class="btn btn-primary">Modifier</a>
+        <form method="post" action="{{ path('private_message_delete', {'id': private_message.id}) }}" style="display:inline-block">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ private_message.id) }}">
+            <button class="btn btn-danger">Supprimer</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

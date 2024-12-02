@@ -1,12 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create/Edit Commission{% endblock %}
+{% block title %}Créer/Modifier une Commission{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/commission/new.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Create/Edit Commission</h1>
+<div class="container">
+    <h1 class="main-title">Créer/Modifier une Commission</h1>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button class="btn">Save</button>
-    {{ form_end(form) }}
+    <div class="form-container">
+        {{ form_start(form, { 'attr': { 'class': 'commission-form' } }) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {{ form_end(form) }}
+    </div>
+
+    <div class="back-link">
+        <a href="{{ path('commission_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</div>
 {% endblock %}

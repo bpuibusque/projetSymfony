@@ -1,39 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Private Messages{% endblock %}
+{% block title %}Messages Privés{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/private_message/index.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Private Messages</h1>
+<div class="container">
+    <h1 class="main-title">Messages Privés</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Sender</th>
-                <th>Receiver</th>
-                <th>Content</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for private_message in private_messages %}
-            <tr>
-                <td>{{ private_message.id }}</td>
-                <td>{{ private_message.sender ? private_message.sender.email : 'Unknown' }}</td>
-                <td>{{ private_message.receiver ? private_message.receiver.email : 'Unknown' }}</td>
-                <td>{{ private_message.content }}</td>
-                <td>
-                    <a href="{{ path('private_message_show', {'id': private_message.id}) }}">show</a>
-                    <a href="{{ path('private_message_edit', {'id': private_message.id}) }}">edit</a>
-                    <form method="post" action="{{ path('private_message_delete', {'id': private_message.id}) }}" style="display:inline-block">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ private_message.id) }}">
-                        <button class="btn">delete</button>
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Expéditeur</th>
+                    <th>Destinataire</th>
+                    <th>Contenu</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for private_message in private_messages %}
+                <tr>
+                    <td>{{ private_message.id }}</td>
+                    <td>{{ private_message.sender ? private_message.sender.email : 'Inconnu' }}</td>
+                    <td>{{ private_message.receiver ? private_message.receiver.email : 'Inconnu' }}</td>
+                    <td>{{ private_message.content }}</td>
+                    <td>
+                        <a href="{{ path('private_message_show', {'id': private_message.id}) }}" class="btn btn-info">Voir</a>
+                        <a href="{{ path('private_message_edit', {'id': private_message.id}) }}" class="btn btn-warning">Modifier</a>
+                        <form method="post" action="{{ path('private_message_delete', {'id': private_message.id}) }}" style="display:inline-block">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ private_message.id) }}">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    <a href="{{ path('private_message_new') }}">Create new</a>
+    <div class="actions">
+        <a href="{{ path('private_message_new') }}" class="btn btn-success">Créer un Nouveau Message</a>
+    </div>
+</div>
 {% endblock %}

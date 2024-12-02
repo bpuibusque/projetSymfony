@@ -2,23 +2,35 @@
 
 {% block title %}Accueil{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/index/index.css') }}">
+{% endblock %}
+
 {% block body %}
-    <div class="container">
-        <h1>Bienvenue sur notre site !</h1>
-        {% if app.user %}
-            <p>Vous êtes connecté en tant que {{ app.user.email }}</p>
-            {% if 'ROLE_ADMIN' in app.user.roles %}
-                <a href="{{ path('admin_privileges') }}" class="btn btn-primary">Gérer les privilèges de Comissions</a>
-                <br>
-                <a href="{{ path('admin_user_index') }}" class="btn btn-primary">Gérer les utilisateurs</a>  
-                <br>              
-                <br>
+<div class="container">
+    <h1 class="main-title">Bienvenue sur notre site !</h1>
+    {% if app.user %}
+        <p class="welcome-message">Vous êtes connecté en tant que <strong>{{ app.user.email }}</strong></p>
+        
+        {% if 'ROLE_ADMIN' in app.user.roles %}
+            <div class="admin-links">
+                <a href="{{ path('admin_privileges') }}" class="btn btn-primary">Gérer les privilèges de Commissions</a>
+                <a href="{{ path('admin_user_index') }}" class="btn btn-primary">Gérer les utilisateurs</a>
+                <a href="{{ path('commission_index') }}" class="btn btn-primary">Gérer les commissions</a>
+                <a href="{{ path('notification_index') }}" class="btn btn-primary">Gérer les notifications</a>
+                <a href="{{ path('post_new') }}" class="btn btn-primary">Créer un post</a>
+                <a href="{{ path('private_message_index') }}" class="btn btn-primary">Gérer les messages privés</a>
                 <!-- Ajoutez d'autres liens pour les administrateurs ici -->
-            {% else %}
-                <p>Vous n'avez pas accès aux fonctionnalités administratives.</p>
-            {% endif %}
+            </div>
         {% else %}
-            <p>Veuillez vous connecter</p>
+            <p class="no-access">Vous n'avez pas accès aux fonctionnalités administratives.</p>
         {% endif %}
-    </div>
+    {% else %}
+        <p class="welcome-message">Veuillez vous connecter pour accéder à nos fonctionnalités.</p>
+        <div class="guest-links">
+            <a href="{{ path('app_login') }}" class="btn btn-link">Login</a>
+            <a href="{{ path('app_register') }}" class="btn btn-link">Register</a>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

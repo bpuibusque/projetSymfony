@@ -2,12 +2,23 @@
 
 {% block title %}Modifier les rôles{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin/user/edit_roles.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Modifier les rôles de {{ user.email }}</h1>
+<div class="container">
+    <h1 class="main-title">Modifier les rôles de <span class="user-email">{{ user.email }}</span></h1>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-    {{ form_end(form) }}
+    <div class="form-container">
+        {{ form_start(form, { 'attr': { 'class': 'roles-form' } }) }}
+            {{ form_widget(form) }}
+            <button type="submit" class="btn btn-primary">Enregistrer les rôles</button>
+        {{ form_end(form) }}
+    </div>
 
-    <a href="{{ path('admin_user_index') }}" class="btn btn-secondary">Retour à la liste des utilisateurs</a>
+    <div class="back-link">
+        <a href="{{ path('admin_user_index') }}" class="btn btn-secondary">Retour à la liste des utilisateurs</a>
+    </div>
+</div>
 {% endblock %}

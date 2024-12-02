@@ -2,14 +2,19 @@
 
 {% block title %}Commission index{% endblock %}
 
-{% block body %}
-    <h1>Commission index</h1>
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/commission/index.css') }}">
+{% endblock %}
 
-    <table>
+{% block body %}
+<div class="container">
+    <h1 class="main-title">Liste des Commissions</h1>
+
+    <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Name</th>
+                <th>ID</th>
+                <th>Nom</th>
                 <th>Description</th>
                 <th>Actions</th>
             </tr>
@@ -20,12 +25,12 @@
                 <td>{{ commission.id }}</td>
                 <td>{{ commission.name }}</td>
                 <td>{{ commission.description }}</td>
-                <td>
-                    <a href="{{ path('commission_show', {'id': commission.id}) }}">show</a>
-                    <a href="{{ path('commission_edit', {'id': commission.id}) }}">edit</a>
-                    <form method="post" action="{{ path('commission_delete', {'id': commission.id}) }}" style="display:inline-block">
+                <td class="actions">
+                    <a href="{{ path('commission_show', {'id': commission.id}) }}" class="btn btn-info">Afficher</a>
+                    <a href="{{ path('commission_edit', {'id': commission.id}) }}" class="btn btn-warning">Modifier</a>
+                    <form method="post" action="{{ path('commission_delete', {'id': commission.id}) }}" class="delete-form">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commission.id) }}">
-                        <button class="btn">delete</button>
+                        <button class="btn btn-danger">Supprimer</button>
                     </form>
                 </td>
             </tr>
@@ -33,5 +38,8 @@
         </tbody>
     </table>
 
-    <a href="{{ path('commission_new') }}">Create new</a>
+    <div class="create-link">
+        <a href="{{ path('commission_new') }}" class="btn btn-success">Créer une nouvelle commission</a>
+    </div>
+</div>
 {% endblock %}

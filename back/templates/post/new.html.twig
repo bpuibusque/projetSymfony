@@ -1,15 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create Post{% endblock %}
+{% block title %}Créer un Post{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/post/new.css') }}">
+{% endblock %}
 
 {% block body %}
-    <div class="container">
-        <h1>Create Post</h1>
-        {{ form_start(form) }}
-            {{ form_row(form.title) }}
-            {{ form_row(form.content) }}
-            {{ form_row(form.commission) }}
-            {{ form_row(form.save) }}
+<div class="container">
+    <h1 class="main-title">Créer un Post</h1>
+
+    <div class="form-container">
+        {{ form_start(form, { 'attr': { 'class': 'post-form' } }) }}
+            {{ form_row(form.title, { 'label': 'Titre' }) }}
+            {{ form_row(form.content, { 'label': 'Contenu' }) }}
+            {{ form_row(form.commission, { 'label': 'Commission' }) }}
+            <button type="submit" class="btn btn-primary">Créer le Post</button>
         {{ form_end(form) }}
     </div>
+
+    <div class="back-link">
+        <a href="{{ path('commission_index') }}" class="btn btn-secondary">Retour à la liste des commissions</a>
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,75 @@
+/* Container Styling */
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Main Title */
+.main-title {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Welcome Message */
+.welcome-message {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+/* Links for Admin */
+.admin-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.admin-links a {
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    background: #007bff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-links a:hover {
+    background-color: #0056b3;
+}
+
+/* No Access */
+.no-access {
+    font-size: 1rem;
+    color: #888;
+    margin-top: 20px;
+}
+
+/* Guest Links */
+.guest-links {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.guest-links a {
+    text-decoration: none;
+    color: white;
+    background: #28a745;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.guest-links a:hover {
+    background-color: #218838;
+}
