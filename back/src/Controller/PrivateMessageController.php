@@ -17,6 +17,14 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 #[Route('/private_message')]
 class PrivateMessageController extends AbstractController
 {
+    #[Route('/', name: 'private_message_index', methods: ['GET'])]
+    public function index(PrivateMessageRepository $privateMessageRepository): Response
+    {
+        return $this->render('private_message/index.html.twig', [
+            'private_messages' => $privateMessageRepository->findAll(),    
+        ]);
+    }
+
     // Affiche les messages reçus
     #[Route('/received', name: 'private_message_received', methods: ['GET'])]
     public function receivedMessages(Request $request, PrivateMessageRepository $privateMessageRepository, EntityManagerInterface $entityManager): JsonResponse
@@ -121,6 +129,40 @@ class PrivateMessageController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Message sent successfully'], 201);
+    }
+
+
+    #[Route('/{id}', name: 'private_message_show', methods: ['GET'])]
+    public function show(PrivateMessage $privateMessage): Response
+    {
+        return $this->render('private_message/show.html.twig', [
+            'private_message' => $privateMessage,
+        ]);
+    }
+    
+    #[Route('/{id}/edit', name: 'private_message_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, PrivateMessage $privateMessage, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(PrivateMessageType::class, $privateMessage);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('private_message_index');
+        }
+        return $this->render('private_message/edit.html.twig', [
+            'private_message' => $privateMessage,
+            'form' => $form->createView(),
+        ]);
+    }
+    #[Route('/{id}', name: 'private_message_delete', methods: ['POST'])]
+    public function delete(Request $request, PrivateMessage $privateMessage, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$privateMessage->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($privateMessage);
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('private_message_index');
     }
 
 }
