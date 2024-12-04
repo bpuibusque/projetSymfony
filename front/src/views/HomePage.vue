@@ -1,7 +1,7 @@
 <template>
   <div v-if="user">
-    <h1>Welcome, {{ user.email }}!</h1>
-    <p>This is the homepage. Use the navigation menu to explore the site.</p>
+    <h1>Bienvenue, {{ user.email }}!</h1>
+    <p>Ceci est la page d'accueil. Utilisez le menu de navigation pour explorer le site.</p>
     <button @click="logout" class="logout-btn">Logout</button>
   </div>
   <div v-else>

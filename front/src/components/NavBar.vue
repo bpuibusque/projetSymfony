@@ -7,7 +7,6 @@
         <li><router-link to="/private-messages">Private Messages</router-link></li>
         <li><router-link to="/notifications">Notifications</router-link></li>
         <li v-if="!user"><router-link to="/login">Login</router-link></li>
-        <li v-if="!user"><router-link to="/register">Register</router-link></li>
         <li v-if="user">
           <a href="#" @click.prevent="logout">Deconnexion</a>
         </li>

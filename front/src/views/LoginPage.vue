@@ -2,7 +2,7 @@
   <div class="login-container">
     <div class="login-content">
       <div class="login-header">
-        <h1 class="signin-title"><span class="title">Please sign in</span></h1>
+        <h1 class="signin-title"><span class="title">Connexion</span></h1>
       </div>
       <div class="login-body">
         <form @submit.prevent="submitForm" class="login-form">
@@ -18,7 +18,7 @@
             required
             autofocus
           />
-          <label for="password">Password</label>
+          <label for="password">Mot de passe</label>
           <input
             type="password"
             v-model="password"
@@ -30,7 +30,7 @@
 
           <div class="login-footer">
             <button class="btn btn-lg btn-primary btn-block" type="submit">
-              Sign in
+              Connexion
             </button>
           </div>
         </form>
