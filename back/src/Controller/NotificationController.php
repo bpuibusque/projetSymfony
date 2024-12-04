@@ -67,11 +67,19 @@ class NotificationController extends AbstractController
 
     // API pour marquer une notification comme lue
     #[Route('/api/{id}/mark-read', name: 'notification_mark_read', methods: ['POST'])]
-    public function markAsRead(Notification $notification, EntityManagerInterface $entityManager): JsonResponse
+    public function markAsRead(Notification $notification, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user || $notification->getUser() !== $user) {
-            return new JsonResponse(['error' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        $data = json_decode($request->getContent(), true);
+        $userID = $data['userID'] ?? null;
+
+        if (!$userID || !is_numeric($userID)) {
+            return new JsonResponse(['error' => 'Invalid or missing userID'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $entityManager->getRepository(User::class)->find($userID);
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
         $notification->setRead(true);
@@ -143,4 +151,34 @@ class NotificationController extends AbstractController
 
         return new JsonResponse(['message' => 'Notification created successfully'], Response::HTTP_CREATED);
     }
+
+    #[Route('/api/notification', name: 'get_notifications', methods: ['GET'])]
+    public function getNotifications(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $userID = $request->query->get('userID'); // Récupérer l'ID de l'utilisateur connecté
+
+        // Vérifier si l'utilisateur est connecté
+        $user = $entityManager->getRepository(User::class)->find($userID);
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        // Récupérer les notifications pour cet utilisateur
+        $notifications = $entityManager->getRepository(Notification::class)->findBy(['user' => $user]);
+
+        $data = array_map(function ($notification) use ($entityManager) {
+            $post = $notification->getPost(); // Récupérer le post lié à la notification
+            $commissionId = $post ? $post->getCommission()->getId() : null; // Récupérer la commission du post
+
+            return [
+                'id' => $notification->getId(),
+                'postId' => $post ? $post->getId() : null,
+                'commissionId' => $commissionId,
+                'createdAt' => $notification->getCreatedAt()->format('Y-m-d H:i:s'),
+            ];
+        }, $notifications);
+
+        return new JsonResponse($data);
+    }
+
 }

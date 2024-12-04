@@ -13,8 +13,8 @@
         <small>{{ new Date(notification.createdAt).toLocaleString() }}</small>
         <button @click="markAsRead(notification.id)">Marquer comme lu</button>
         <router-link
-          v-if="notification.post"
-          :to="`/posts/${notification.post}`"
+          v-if="notification.postId && notification.commissionId"
+          :to="`/commissions/${notification.commissionId}/posts`"
           class="view-post-link"
         >
           Voir le post
@@ -47,7 +47,7 @@ export default {
         return;
       }
       axios
-        .get('/notification/api', { params: { userID } })
+        .get('/notification/api/notification', { params: { userID } })
         .then((response) => {
           this.notifications = response.data;
         })
@@ -56,8 +56,15 @@ export default {
         });
     },
     markAsRead(notificationId) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const userID = user ? user['id'] : null;
+      console.log(userID);
+      if (!userID) {
+        console.error('Aucun ID utilisateur trouvé dans le localStorage.');
+        return;
+      }
       axios
-        .post(`/notification/${notificationId}/mark-read`)
+        .post(`/notification/api/${notificationId}/mark-read`, { userID })
         .then(() => {
           const notification = this.notifications.find((n) => n.id === notificationId);
           if (notification) notification.isRead = true;
@@ -72,6 +79,7 @@ export default {
   },
 };
 </script>
+
 
 <style>
 .notification-container {
