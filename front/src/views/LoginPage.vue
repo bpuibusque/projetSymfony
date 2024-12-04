@@ -8,10 +8,6 @@
         <form @submit.prevent="submitForm" class="login-form">
           <div v-if="error" class="alert alert-danger">{{ errorMessage }}</div>
 
-          <div v-if="user" class="mb-3">
-            You are logged in as {{ userIdentifier }}, <a @click="logout">Logout</a>
-          </div>
-
           <label for="username">Email</label>
           <input
             type="email"
@@ -69,23 +65,20 @@ export default {
           })
         });
         const data = await response.json();
-        if (data.success) {
-          this.user = { userIdentifier: data.userIdentifier };
-          this.error = false;
+        if (data.token) {
+          // Stocker les informations utilisateur et token
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          this.$store.commit('setUser', data.user); // Optionnel si vous utilisez Vuex/Pinia
+          this.$router.push('/home'); // Redirigez vers une autre page
         } else {
           this.error = true;
-          this.errorMessage = data.message;
+          this.errorMessage = 'Invalid credentials';
         }
       } catch (err) {
         this.error = true;
         this.errorMessage = 'An error occurred. Please try again.';
       }
-    },
-    async logout() {
-      await fetch('http://localhost:8000/api/logout', { method: 'POST' });
-      this.user = null;
-      this.username = '';
-      this.password = '';
     },
   },
 };

@@ -8,21 +8,26 @@
         <li v-if="!user"><router-link to="/login">Login</router-link></li>
         <li v-if="!user"><router-link to="/register">Register</router-link></li>
         <li v-if="user">
-          <span @click="logout">{{ user.email }}</span>
+          <a href="#" @click.prevent="logout">Deconnexion</a>
         </li>
       </ul>
     </nav>
   </template>
   
   <script>
-  import { mapState, mapActions } from 'vuex';
+  import { mapState } from 'vuex';
   
   export default {
     computed: {
       ...mapState(['user']),
     },
     methods: {
-      ...mapActions(['logout']),
+      logout() {
+        // Effacer la session utilisateur côté frontend
+        localStorage.removeItem('user');
+        this.$store.commit('clearUser'); // Si vous utilisez Vuex/Pinia
+        this.$router.push('/login'); // Rediriger vers la page de connexion
+      },
     },
   };
   </script>

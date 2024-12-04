@@ -14,3 +14,8 @@ api_login:
     path: /api/login
     controller: App\Controller\SecurityController::apiLogin
     methods: [POST]
+
+api_user:
+    path: /api/user
+    controller: App\Controller\SecurityController::getUserInfo
+    methods: [GET]
