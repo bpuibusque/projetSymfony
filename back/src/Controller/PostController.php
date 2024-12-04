@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Entity\Commission;
+use App\Entity\User;
 use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -53,13 +54,12 @@ class PostController extends AbstractController
     #[Route('/api/new', name: 'api_post_new', methods: ['POST'])]
     public function apiNew(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return new JsonResponse(['error' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['userID']) || !is_numeric($data['userID'])) {
+            return new JsonResponse(['error' => 'Invalid or missing userID'], Response::HTTP_BAD_REQUEST);
         }
 
-        $data = json_decode($request->getContent(), true);
-
+        $user = $entityManager->getRepository(User::class)->find($data['userID']);
         // Vérifiez si la commission existe
         $commission = $entityManager->getRepository(Commission::class)->find($data['commission']['id'] ?? null);
         if (!$commission) {

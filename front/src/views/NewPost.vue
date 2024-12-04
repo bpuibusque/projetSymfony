@@ -17,7 +17,6 @@
 
 <script>
 import axios from 'axios';
-
 export default {
   name: 'NewPost',
   data() {
@@ -30,6 +29,7 @@ export default {
     createPost() {
       const url = `/posts/api/new`; // Nouvelle URL pour l'API
       const payload = {
+        userID: JSON.parse(localStorage.getItem('user'))['id'],
         title: this.title,
         content: this.content,
         commission: { id: this.$route.params.id }, // Inclure l'ID de la commission
