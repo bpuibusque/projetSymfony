@@ -58,13 +58,13 @@ export default {
   methods: {
     async submitForm() {
       try {
-        const response = await fetch('http://localhost:3000/api/login', {
+        const response = await fetch('http://localhost:8000/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            username: this.username,
+            email: this.username,
             password: this.password
           })
         });
@@ -82,7 +82,7 @@ export default {
       }
     },
     async logout() {
-      await fetch('http://localhost:3000/api/logout', { method: 'POST' });
+      await fetch('http://localhost:8000/api/logout', { method: 'POST' });
       this.user = null;
       this.username = '';
       this.password = '';
