@@ -1,24 +1,14 @@
 <template>
-  <div>
-    <h1>Commissions</h1>
-    <div v-if="commissions.length">
-      <div class="nav-container">
-        <button 
-          v-for="commission in commissions" 
-          :key="commission.id" 
-          @click="setActiveCommission(commission.id)"
-          :class="{ active: isActive(commission.id) }"
-          class="nav-button"
-        >
-          {{ commission.name }}
-        </button>
+  <div class="container">
+    <h1 class="title">Liste des Commissions</h1>
+    <div class="commissions-grid">
+      <div v-for="commission in commissions" :key="commission.id" class="commission-card">
+        <h2 class="commission-title">{{ commission.name }}</h2>
+        <p class="commission-description">{{ commission.description }}</p>
+        <router-link :to="`/commissions/${commission.id}/posts`" class="view-posts-button">
+          Voir les posts
+        </router-link>
       </div>
-      <div class="post-container">
-        <router-view />
-      </div>
-    </div>
-    <div v-else>
-      <p>No commissions available.</p>
     </div>
   </div>
 </template>
@@ -31,7 +21,6 @@ export default {
   data() {
     return {
       commissions: [],
-      activeCommission: 'general'
     };
   },
   created() {
@@ -44,51 +33,78 @@ export default {
           this.commissions = response.data;
         })
         .catch(error => {
-          console.error('Error fetching commissions:', error);
+          console.error('Erreur lors de la récupération des commissions:', error);
         });
     },
-    setActiveCommission(id) {
-      this.activeCommission = id;
-      this.$router.push(`/commissions/${id}/posts`);
-    },
-    isActive(commissionId) {
-      return this.activeCommission === String(commissionId);
-    }
   },
 };
 </script>
 
 <style>
-.nav-container {
-  display: flex;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #ddd;
-}
-.nav-button {
-  cursor: pointer;
-  padding: 10px 15px;
-  border: 1px solid transparent;
-  border-radius: 4px 4px 0 0;
-  background-color: #f8f9fa;
-  color: #007bff;
-  margin-right: 10px;
-}
-.nav-button:hover {
-  background-color: #e9ecef;
-}
-.nav-button.active {
-  background-color: #ffffff;
-  border-color: #dee2e6 #dee2e6 #fff;
-  color: #495057;
-}
-.post-container {
+/* Container styling */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #ffffff;
+  font-family: Arial, sans-serif;
 }
-.post {
-  border-bottom: 1px solid #ddd;
-  padding: 15px 0;
+
+/* Title styling */
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+}
+
+/* Grid layout for commissions */
+.commissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Individual commission card styling */
+.commission-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background: #f9f9f9;
+  transition: box-shadow 0.3s ease;
+}
+
+.commission-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styling for each commission */
+.commission-title {
+  font-size: 18px;
+  margin: 0 0 10px;
+  color: #222;
+}
+
+/* Description styling */
+.commission-description {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+/* Button styling */
+.view-posts-button {
+  display: inline-block;
+  text-decoration: none;
+  background: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  transition: background 0.3s ease;
+}
+
+.view-posts-button:hover {
+  background: #0056b3;
 }
 </style>

@@ -4,10 +4,10 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Notification;
 use App\Entity\Post;
-use App\Form\NotificationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -15,7 +15,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 #[Route('/notification')]
 class NotificationController extends AbstractController
 {
-    #[Route('/', name: 'notification_index')]
+    // Page d'index des notifications
+    #[Route('/', name: 'notification_index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('notification/index.html.twig', [
@@ -23,6 +24,31 @@ class NotificationController extends AbstractController
         ]);
     }
 
+    // API pour récupérer les notifications de l'utilisateur connecté
+    #[Route('/api', name: 'notification_api_index', methods: ['GET'])]
+    public function apiIndex(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        }
+
+        $notifications = $entityManager->getRepository(Notification::class)->findBy(['user' => $user]);
+
+        $data = array_map(function ($notification) {
+            return [
+                'id' => $notification->getId(),
+                'message' => $notification->getMessage(),
+                'isRead' => $notification->isRead(),
+                'post' => $notification->getPost() ? $notification->getPost()->getId() : null,
+                'createdAt' => $notification->getCreatedAt()->format('Y-m-d H:i:s'),
+            ];
+        }, $notifications);
+
+        return new JsonResponse($data);
+    }
+
+    // Affiche une notification spécifique
     #[Route('/show/{id}', name: 'notification_show', methods: ['GET'])]
     public function show(Notification $notification): Response
     {
@@ -31,7 +57,23 @@ class NotificationController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'notification_new')]
+    // API pour marquer une notification comme lue
+    #[Route('/api/{id}/mark-read', name: 'notification_mark_read', methods: ['POST'])]
+    public function markAsRead(Notification $notification, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user || $notification->getUser() !== $user) {
+            return new JsonResponse(['error' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        }
+
+        $notification->setRead(true);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Notification marked as read']);
+    }
+
+    // Création d'une nouvelle notification
+    #[Route('/new', name: 'notification_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $notification = new Notification();
@@ -41,13 +83,12 @@ class NotificationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             if (!$user) {
-                throw new AccessDeniedException('You must be logged in to create a commission.');
+                throw new AccessDeniedException('You must be logged in to create a notification.');
             }
 
             $notification->setUser($user);
-            $notification->setRead($notification->isRead());
-            $notification->setPost($notification->getPost());
-            $notification->setCreatedAt($notification->getCreatedAt());
+            $notification->setCreatedAt(new \DateTime());
+            $notification->setRead(false);
 
             $entityManager->persist($notification);
             $entityManager->flush();
