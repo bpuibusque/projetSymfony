@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Doctrine\ORM\EntityManagerInterface;
 class SecurityController extends AbstractController
 {
     public function __construct(
@@ -92,5 +93,20 @@ class SecurityController extends AbstractController
             'email' => $user->getEmail(),
             'roles' => $user->getRoles(),
         ]);
+    }
+
+    #[Route('/users/api/users', name: 'api_users', methods: ['GET'])]
+    public function fetchUsers(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $users = $entityManager->getRepository(User::class)->findAll();
+
+        $data = array_map(function ($users) {
+            return [
+                'id' => $users->getId(),
+                'email' => $users->getEmail(),
+            ];
+        }, $users);
+
+        return new JsonResponse($data);
     }
 }

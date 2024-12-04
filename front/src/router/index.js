@@ -8,17 +8,19 @@ import RegisterPage from '../views/RegisterPage.vue';
 import NewPost from '../views/NewPost.vue';
 import NotificationIndex from '../views/NotificationIndex.vue';
 import CreateNotification from '../views/CreateNotification.vue';
+import NewPrivateMessage from '../views/NewPrivateMessage.vue';
 
 const routes = [
   { path: '/', name: 'HomePage', component: HomePage },
   { path: '/commissions', name: 'CommissionPage', component: CommissionPage },
   { path: '/commissions/:id/posts', name: 'CommissionPosts', component: CommissionPosts },
-  { path: '/commissions/:id/new-post', name: 'NewPost', component: NewPost }, // Nouvelle route
+  { path: '/commissions/:id/new-post', name: 'NewPost', component: NewPost }, 
   { path: '/private-messages', name: 'PrivateMessages', component: PrivateMessages },
   { path: '/login', name: 'LoginPage', component: LoginPage },
   { path: '/register', name: 'RegisterPage', component: RegisterPage },
   { path: '/notifications', name: 'NotificationIndex', component: NotificationIndex },
   { path: '/notifications/create', name: 'CreateNotification', component: CreateNotification,},
+  { path: '/private_message/new', name: 'NewPrivateMessage', component: NewPrivateMessage }, 
 ];
 
 const router = createRouter({
