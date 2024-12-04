@@ -40,8 +40,14 @@ export default {
   },
   methods: {
     fetchNotifications() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const userID = user ? user['id'] : null;
+      if (!userID) {
+        console.error('Aucun ID utilisateur trouvé dans le localStorage.');
+        return;
+      }
       axios
-        .get('/notification/api')
+        .get('/notification/api', { params: { userID } })
         .then((response) => {
           this.notifications = response.data;
         })

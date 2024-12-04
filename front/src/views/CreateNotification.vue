@@ -3,8 +3,13 @@
     <h1>Créer une Notification</h1>
     <form @submit.prevent="createNotification">
       <div class="form-group">
-        <label for="message">Message :</label>
-        <textarea v-model="message" id="message" rows="4" required></textarea>
+        <label for="post">Sélectionner un post :</label>
+        <select v-model="selectedPost" id="post" required>
+          <option value="" disabled>Choisir un post</option>
+          <option v-for="post in posts" :key="post.id" :value="post.id">
+            {{ post.title }}
+          </option>
+        </select>
       </div>
       <button type="submit" class="submit-button">Envoyer</button>
     </form>
@@ -18,16 +23,48 @@ export default {
   name: 'CreateNotification',
   data() {
     return {
-      message: '',
+      posts: [], // Liste des posts récupérés
+      selectedPost: '', // Post sélectionné
     };
   },
+  created() {
+    this.fetchPosts(); // Charger les posts lors de la création du composant
+  },
   methods: {
-    createNotification() {
+    // Méthode pour récupérer tous les posts depuis l'API
+    fetchPosts() {
       axios
-        .post('/notification/api/create', { message: this.message })
+        .get('posts/api/posts') // Changez cette URL selon votre route backend
+        .then((response) => {
+          this.posts = response.data;
+        })
+        .catch((error) => {
+          console.error('Erreur lors de la récupération des posts :', error);
+        });
+    },
+    // Méthode pour créer une notification
+    createNotification() {
+      const user = JSON.parse(localStorage.getItem('user')); // Récupérer les infos utilisateur
+      const userID = user ? user['id'] : null;
+
+      if (!userID) {
+        alert('Utilisateur non trouvé.');
+        return;
+      }
+
+      if (!this.selectedPost) {
+        alert('Veuillez sélectionner un post.');
+        return;
+      }
+
+      axios
+        .post('/notification/api/create', {
+          postID: this.selectedPost, // ID du post sélectionné
+          userID, // ID de l'utilisateur
+        })
         .then(() => {
           alert('Notification créée avec succès.');
-          this.message = ''; // Réinitialiser le champ
+          this.selectedPost = ''; // Réinitialiser la sélection
         })
         .catch((error) => {
           console.error('Erreur lors de la création de la notification :', error);
@@ -55,12 +92,13 @@ label {
   margin-bottom: 5px;
 }
 
-textarea {
+select {
   width: 100%;
   padding: 10px;
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  background: #fff;
 }
 
 .submit-button {

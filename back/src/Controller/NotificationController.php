@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Notification;
 use App\Entity\Post;
+use App\Entity\User;
+use App\Form\NotificationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -26,13 +28,20 @@ class NotificationController extends AbstractController
 
     // API pour récupérer les notifications de l'utilisateur connecté
     #[Route('/api', name: 'notification_api_index', methods: ['GET'])]
-    public function apiIndex(EntityManagerInterface $entityManager): JsonResponse
+    public function apiIndex(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return new JsonResponse(['error' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        $userID = $request->query->get('userID');
+         // Vérifiez si l'userID est valide
+        if (!$userID || !is_numeric($userID)) {
+            return new JsonResponse(['error' => 'Invalid or missing userID'], Response::HTTP_BAD_REQUEST);
         }
-
+        $user = $entityManager->getRepository(User::class)->find($userID);
+        // Vérifiez si l'utilisateur existe
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        // Récupérer l'utilisateur à partir de l'userID
+        $user = $entityManager->getRepository(User::class)->find($userID);
         $notifications = $entityManager->getRepository(Notification::class)->findBy(['user' => $user]);
 
         $data = array_map(function ($notification) {
@@ -105,21 +114,28 @@ class NotificationController extends AbstractController
     #[Route('/api/create', name: 'notification_create', methods: ['POST'])]
     public function createNotification(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return new JsonResponse(['error' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        $data = json_decode($request->getContent(), true);
+        $userID = $data['userID'] ?? null;
+        $postID = $data['postID'] ?? null;
+
+        if (!$userID || !is_numeric($userID)) {
+            return new JsonResponse(['error' => 'Invalid or missing userID'], Response::HTTP_BAD_REQUEST);
         }
 
-        $data = json_decode($request->getContent(), true);
-        $message = $data['message'] ?? null;
+        $user = $entityManager->getRepository(User::class)->find($userID);
 
-        if (!$message) {
-            return new JsonResponse(['error' => 'Message is required'], Response::HTTP_BAD_REQUEST);
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $post = $entityManager->getRepository(Post::class)->find($postID);
+        if (!$post) {
+            return new JsonResponse(['error' => 'Post not found'], Response::HTTP_NOT_FOUND);
         }
 
         $notification = new Notification();
         $notification->setUser($user);
-        $notification->setMessage($message);
+        $notification->setPost($post);
         $notification->setCreatedAt(new \DateTime());
         $notification->setRead(false);
 

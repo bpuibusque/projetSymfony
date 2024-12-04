@@ -60,6 +60,9 @@ class PostController extends AbstractController
         }
 
         $user = $entityManager->getRepository(User::class)->find($data['userID']);
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
         // Vérifiez si la commission existe
         $commission = $entityManager->getRepository(Commission::class)->find($data['commission']['id'] ?? null);
         if (!$commission) {
@@ -76,5 +79,20 @@ class PostController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Post created successfully'], Response::HTTP_CREATED);
+    }
+
+    #[Route('/api/posts', name: 'api_posts', methods: ['GET'])]
+    public function fetchPosts(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $posts = $entityManager->getRepository(Post::class)->findAll();
+
+        $data = array_map(function ($post) {
+            return [
+                'id' => $post->getId(),
+                'title' => $post->getTitle(),
+            ];
+        }, $posts);
+
+        return new JsonResponse($data);
     }
 }
