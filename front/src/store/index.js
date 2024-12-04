@@ -1,5 +1,4 @@
 import { createStore } from 'vuex';
-import axios from 'axios';
 
 export default createStore({
   state: {
@@ -9,22 +8,16 @@ export default createStore({
     setUser(state, user) {
       state.user = user;
     },
+    clearUser(state) {
+      state.user = null;
+    },
   },
   actions: {
-    async fetchUser({ commit }) {
-      try {
-        const response = await axios.get('/api/user');
-        commit('setUser', response.data);
-      } catch (error) {
-        console.error(error);
+    fetchUser({ commit }) {
+      const user = localStorage.getItem('user');
+      if (user) {
+        commit('setUser', JSON.parse(user));
       }
     },
-    login({ commit }, user) {
-      commit('setUser', user);
-    },
-    logout({ commit }) {
-      commit('setUser', null);
-    },
   },
-  modules: {},
 });

@@ -15,6 +15,7 @@ api_login:
     controller: App\Controller\SecurityController::apiLogin
     methods: [POST]
 
+<<<<<<< HEAD
 # Routes pour CommissionController
 commissions:
     resource: '../src/Controller/CommissionController.php'
@@ -29,3 +30,9 @@ posts:
 private_messages:
     resource: '../src/Controller/PrivateMessageController.php'
     type: attribute
+=======
+api_user:
+    path: /api/user
+    controller: App\Controller\SecurityController::getUserInfo
+    methods: [GET]
+>>>>>>> origin/Test-Lucas
