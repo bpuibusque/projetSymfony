@@ -7,7 +7,7 @@ import LoginPage from '../views/LoginPage.vue';
 import RegisterPage from '../views/RegisterPage.vue';
 import NewPost from '../views/NewPost.vue';
 import NotificationIndex from '../views/NotificationIndex.vue';
-
+import CreateNotification from '../views/CreateNotification.vue';
 
 const routes = [
   { path: '/', name: 'HomePage', component: HomePage },
@@ -18,6 +18,7 @@ const routes = [
   { path: '/login', name: 'LoginPage', component: LoginPage },
   { path: '/register', name: 'RegisterPage', component: RegisterPage },
   { path: '/notifications', name: 'NotificationIndex', component: NotificationIndex },
+  { path: '/notifications/create', name: 'CreateNotification', component: CreateNotification,},
 ];
 
 const router = createRouter({

@@ -1,6 +1,7 @@
 <template>
   <div class="notification-container">
     <h1>Mes Notifications</h1>
+    <button @click="goToCreateNotification" class="create-notification-btn">Créer une Notification</button>
     <ul v-if="notifications.length" class="notification-list">
       <li
         v-for="notification in notifications"
@@ -59,6 +60,9 @@ export default {
           console.error('Erreur lors de la mise à jour de la notification :', error);
         });
     },
+    goToCreateNotification() {
+      this.$router.push('/notifications/create');
+    },
   },
 };
 </script>
@@ -111,5 +115,23 @@ button {
 
 button:hover {
   background-color: #218838;
+}
+
+/* Style for Create Notification Button */
+.create-notification-btn {
+  display: block;
+  margin: 10px auto 20px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.create-notification-btn:hover {
+  background-color: #0056b3;
 }
 </style>

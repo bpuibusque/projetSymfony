@@ -70,7 +70,7 @@ export default {
           localStorage.setItem('authToken', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
           this.$store.commit('setUser', data.user); // Optionnel si vous utilisez Vuex/Pinia
-          this.$router.push('/home'); // Redirigez vers une autre page
+          this.$router.push('/'); // Redirigez vers une autre page
         } else {
           this.error = true;
           this.errorMessage = 'Invalid credentials';

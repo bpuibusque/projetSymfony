@@ -101,4 +101,31 @@ class NotificationController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/api/create', name: 'notification_create', methods: ['POST'])]
+    public function createNotification(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Access Denied'], Response::HTTP_FORBIDDEN);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $message = $data['message'] ?? null;
+
+        if (!$message) {
+            return new JsonResponse(['error' => 'Message is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $notification = new Notification();
+        $notification->setUser($user);
+        $notification->setMessage($message);
+        $notification->setCreatedAt(new \DateTime());
+        $notification->setRead(false);
+
+        $entityManager->persist($notification);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Notification created successfully'], Response::HTTP_CREATED);
+    }
 }
