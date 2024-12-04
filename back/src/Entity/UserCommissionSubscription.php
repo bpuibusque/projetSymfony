@@ -1,23 +1,23 @@
 <?php
-
 namespace App\Entity;
 
-use App\Repository\UserCommissionSubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserCommissionSubscriptionRepository::class)]
+#[ORM\Entity]
 class UserCommissionSubscription
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'integer')]
+    private $id;
 
-    #[ORM\ManyToOne(inversedBy: 'userCommissionSubscriptions')]
-    private ?User $user = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private $user;
 
-    #[ORM\ManyToOne(inversedBy: 'userCommissionSubscriptions')]
-    private ?Commission $comission = null;
+    #[ORM\ManyToOne(targetEntity: Commission::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private $commission;
 
     public function getId(): ?int
     {
@@ -29,22 +29,20 @@ class UserCommissionSubscription
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUser(?User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
     public function getCommission(): ?Commission
     {
-        return $this->comission;
+        return $this->commission;
     }
 
-    public function setCommission(?Commission $comission): static
+    public function setCommission(?Commission $commission): self
     {
-        $this->comission = $comission;
-
+        $this->commission = $commission;
         return $this;
     }
 }

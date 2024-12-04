@@ -47,7 +47,6 @@ class NotificationController extends AbstractController
         $data = array_map(function ($notification) {
             return [
                 'id' => $notification->getId(),
-                'message' => $notification->getMessage(),
                 'isRead' => $notification->isRead(),
                 'post' => $notification->getPost() ? $notification->getPost()->getId() : null,
                 'createdAt' => $notification->getCreatedAt()->format('Y-m-d H:i:s'),

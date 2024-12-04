@@ -8,6 +8,21 @@
         <router-link :to="`/commissions/${commission.id}/posts`" class="view-posts-button">
           Voir les posts
         </router-link>
+        <!-- Affiche le bouton approprié en fonction de l'état d'abonnement -->
+        <button
+          v-if="!commission.isSubscribed"
+          class="subscribe-button"
+          @click="subscribeToCommission(commission.id)"
+        >
+          S'abonner
+        </button>
+        <button
+          v-else
+          class="unsubscribe-button"
+          @click="unsubscribeFromCommission(commission.id)"
+        >
+          Se désabonner
+        </button>
       </div>
     </div>
   </div>
@@ -20,21 +35,70 @@ export default {
   name: 'CommissionPage',
   data() {
     return {
-      commissions: [],
+      commissions: [], // Liste des commissions
     };
   },
   created() {
-    this.fetchCommissions();
+    this.fetchCommissions(); // Charger les commissions au démarrage
   },
   methods: {
-    fetchCommissions() {
-      axios.get('/commissions/api')
-        .then(response => {
-          this.commissions = response.data;
-        })
-        .catch(error => {
-          console.error('Erreur lors de la récupération des commissions:', error);
-        });
+    async fetchCommissions() {
+      const user = JSON.parse(localStorage.getItem('user')); // Récupère l'utilisateur connecté
+      const userID = user ? user.id : null;
+      try {
+        const response = await axios.get('/commissions/api/getSubscribe', { params: { userID } });
+        this.commissions = response.data; // Assigner les données reçues
+      } catch (error) {
+        console.error('Erreur lors de la récupération des commissions:', error);
+      }
+    },
+    async subscribeToCommission(commissionId) {
+      const user = JSON.parse(localStorage.getItem('user')); // Récupère l'utilisateur connecté
+      const userID = user ? user.id : null;
+
+      if (!userID) {
+        alert('Utilisateur non connecté.');
+        return;
+      }
+
+      try {
+        // Envoi de la requête POST
+        await axios.post(`/commissions/${commissionId}/subscribe`, { userID });
+
+        // Met à jour localement l'état de la commission après l'abonnement
+        const commission = this.commissions.find((c) => c.id === commissionId);
+        if (commission) {
+          commission.isSubscribed = true;
+        }
+
+        alert(`Vous êtes maintenant abonné à la commission ${commissionId}.`);
+      } catch (error) {
+        console.error("Erreur lors de l'abonnement à la commission :", error);
+      }
+    },
+    async unsubscribeFromCommission(commissionId) {
+      const user = JSON.parse(localStorage.getItem('user')); // Récupère l'utilisateur connecté
+      const userID = user ? user.id : null;
+
+      if (!userID) {
+        alert('Utilisateur non connecté.');
+        return;
+      }
+
+      try {
+        // Envoi de la requête DELETE pour se désabonner
+        await axios.delete(`/commissions/${commissionId}/unsubscribe`, { data: { userID } });
+
+        // Met à jour localement l'état de la commission après le désabonnement
+        const commission = this.commissions.find((c) => c.id === commissionId);
+        if (commission) {
+          commission.isSubscribed = false;
+        }
+
+        alert(`Vous êtes maintenant désabonné de la commission ${commissionId}.`);
+      } catch (error) {
+        console.error("Erreur lors du désabonnement à la commission :", error);
+      }
     },
   },
 };
@@ -106,5 +170,39 @@ export default {
 
 .view-posts-button:hover {
   background: #0056b3;
+}
+
+.subscribe-button {
+  display: inline-block;
+  margin-top: 10px;
+  background: #28a745;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.subscribe-button:hover {
+  background: #218838;
+}
+
+.unsubscribe-button {
+  display: inline-block;
+  margin-top: 10px;
+  background: #dc3545;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.unsubscribe-button:hover {
+  background: #c82333;
 }
 </style>

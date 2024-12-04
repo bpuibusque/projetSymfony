@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Commission;
+use App\Entity\User;
 use App\Entity\UserCommissionSubscription;
 use App\Form\CommissionType;
 use App\Repository\CommissionRepository;
@@ -127,9 +128,24 @@ class CommissionController extends AbstractController
     #[Route('/{id}/subscribe', name: 'commission_subscribe', methods: ['POST'])]
     public function subscribe(Request $request, Commission $commission, EntityManagerInterface $entityManager): Response
     {
-        $user = $this->getUser();
+        $data = json_decode($request->getContent(), true);
+        $userID = $data['userID'] ?? null;
+
+        if (!$userID) {
+            return new JsonResponse(['error' => 'User ID is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Récupérer l'utilisateur depuis la base de données
+        $user = $entityManager->getRepository(User::class)->find($userID);
         if (!$user) {
-            throw $this->createAccessDeniedException('You must be logged in to subscribe to a commission.');
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $existingSubscription = $entityManager->getRepository(UserCommissionSubscription::class)
+        ->findOneBy(['user' => $user, 'commission' => $commission]);
+
+        if ($existingSubscription) {
+            return new JsonResponse(['error' => 'Already subscribed'], Response::HTTP_CONFLICT);
         }
 
         $subscription = new UserCommissionSubscription();
@@ -140,5 +156,72 @@ class CommissionController extends AbstractController
         $entityManager->flush();
 
         return $this->redirectToRoute('commission_show', ['id' => $commission->getId()]);
+    }
+
+
+    #[Route('/api/getSubscribe', name: 'get_commission_subscribe', methods: ['GET'])]
+    public function getCommissions(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $userID = $request->query->get('userID');
+        if (!$userID) {
+            return new JsonResponse(['error' => 'User ID is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Récupérer l'utilisateur
+        $user = $entityManager->getRepository(User::class)->find($userID);
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        $commissions = $entityManager->getRepository(Commission::class)->findAll();
+        $subscriptionRepo = $entityManager->getRepository(UserCommissionSubscription::class);
+
+        $data = array_map(function ($commission) use ($user, $subscriptionRepo) {
+            // Vérifier si l'utilisateur est abonné à la commission
+            $isSubscribed = $subscriptionRepo->findOneBy([
+                'user' => $user,
+                'commission' => $commission,
+            ]) !== null;
+    
+            return [
+                'id' => $commission->getId(),
+                'name' => $commission->getName(),
+                'description' => $commission->getDescription(),
+                'isSubscribed' => $isSubscribed,
+            ];
+        }, $commissions);
+
+        return new JsonResponse($data);
+    }
+
+    #[Route('/{id}/unsubscribe', name: 'commission_unsubscribe', methods: ['DELETE'])]
+    public function unsubscribe(Request $request, Commission $commission, EntityManagerInterface $entityManager): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $userID = $data['userID'] ?? null;
+
+        if (!$userID) {
+            return new JsonResponse(['error' => 'User ID is required'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Récupérer l'utilisateur
+        $user = $entityManager->getRepository(User::class)->find($userID);
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Trouver l'abonnement existant
+        $subscription = $entityManager->getRepository(UserCommissionSubscription::class)
+            ->findOneBy(['user' => $user, 'commission' => $commission]);
+
+        if (!$subscription) {
+            return new JsonResponse(['error' => 'Subscription not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Supprimer l'abonnement
+        $entityManager->remove($subscription);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Successfully unsubscribed'], Response::HTTP_OK);
     }
 }
